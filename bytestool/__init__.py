@@ -1,1 +1,1 @@
-#from .bytestool import bytestool
+from .bytestool import read_by_byte
