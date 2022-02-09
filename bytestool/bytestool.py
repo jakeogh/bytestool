@@ -91,11 +91,13 @@ def cli(ctx,
 @cli.command()
 @click.argument("matches", type=str, nargs=-1, required=True,)
 @click.option('--not-byte-alinged', is_flag=True,)
+@click.option('--hex', 'hexencoding', is_flag=True,)
 @click_add_options(click_global_options)
 @click.pass_context
 def byte_offset_of_match(ctx,
                          matches: tuple[str],
                          not_byte_alinged: bool,
+                         hexencoding: bool,
                          verbose: int,
                          verbose_inf: bool,
                          ):
@@ -113,8 +115,11 @@ def byte_offset_of_match(ctx,
         if verbose:
             ic(index, path)
             _path = Path(os.fsdecode(path))
-        const_bitstream = ConstBitStream(filename=path)
+        const_bitstream = ConstBitStream(filename=_path)
         for _match_str in matches:
-            _match_bytes = _match_str.encode('utf8')
+            if hexencoding:
+                _match_bytes = bytes.fromhex(_match_str)
+            else:
+                _match_bytes = _match_str.encode('utf8')
             found = const_bitstream.find(_match_bytes, bytealigned=byte_alinged)
             ic(found)
