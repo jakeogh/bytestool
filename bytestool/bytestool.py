@@ -22,6 +22,8 @@
 # pylint: disable=C0305  # Trailing newlines editor should fix automatically, pointless warning
 # pylint: disable=C0413  # TEMP isort issue [wrong-import-position] Import "from pathlib import Path" should be placed at the top of the module [C0413]
 
+import os
+from pathlib import Path
 from signal import SIG_DFL
 from signal import SIGPIPE
 from signal import signal
@@ -31,12 +33,13 @@ from typing import Iterator
 from typing import Union
 
 import click
-#from asserttool import tv
-from asserttool import eprint
 from asserttool import ic
 from asserttool import increment_debug
+from asserttool import tv
+from bitstring import ConstBitStream
 from clicktool import click_add_options
 from clicktool import click_global_options
+from unmp import unmp
 
 #this should be earlier in the imports, but isort stops working
 signal(SIGPIPE, SIG_DFL)
@@ -51,8 +54,6 @@ def read_by_byte(file_object,
     if verbose:
         ic(byte)
     buf = b""
-    #for chunk in iter(lambda: file_object.read(131072), b""):
-    #for chunk in iter(lambda: file_object.read(8192), b""):
     for chunk in iter(lambda: file_object.read(buffer_size), b""):
         if verbose > 2:
             ic(chunk)
@@ -73,18 +74,44 @@ def read_by_byte(file_object,
         yield buf
 
 
-@click.command()
-@click.option('--ipython', is_flag=True)
+@click.group()
 @click_add_options(click_global_options)
 @click.pass_context
 def cli(ctx,
-        ipython: bool,
         verbose: int,
         verbose_inf: bool,
         ):
 
-    #tty, verbose = tv(ctx=ctx,
-    #                  verbose=verbose,
-    #                  verbose_inf=verbose_inf,
-    #                  )
-    pass
+    tty, verbose = tv(ctx=ctx,
+                      verbose=verbose,
+                      verbose_inf=verbose_inf,
+                      )
+
+
+@cli.command()
+@click.argument("matches", type=str, nargs=-1, required=True,)
+@click_add_options(click_global_options)
+@click.pass_context
+def byte_offset_of_match(ctx,
+                         matches: tuple[str],
+                         verbose: int,
+                         verbose_inf: bool,
+                         ):
+
+    tty, verbose = tv(ctx=ctx,
+                      verbose=verbose,
+                      verbose_inf=verbose_inf,
+                      )
+
+    iterator = unmp(valid_types=[bytes,], verbose=verbose)
+
+    index = 0
+    for index, path in enumerate(iterator):
+        if verbose:
+            ic(index, path)
+            _path = Path(os.fsdecode(path))
+        const_bitstream = ConstBitStream(filename=path)
+        for _match_str in matches:
+            _match_bytes = _match_str.encode('utf8')
+            found = const_bitstream.find(_match_bytes, bytealigned=True)
+            ic(found)
