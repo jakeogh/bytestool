@@ -88,6 +88,20 @@ def cli(ctx,
                       )
 
 
+def find_byte_match_in_path(*,
+                            bytes_match: bytes,
+                            path: Path,
+                            byte_alinged: bool,
+                            verbose: int,
+                            ) -> tuple[int]:
+
+    if verbose:
+        ic(path, bytes_match, byte_alinged)
+    const_bitstream = ConstBitStream(filename=path)
+    found = const_bitstream.find(bytes_match, bytealigned=byte_alinged)
+    return found
+
+
 @cli.command()
 @click.argument("matches", type=str, nargs=-1, required=True,)
 @click.option('--not-byte-alinged', is_flag=True,)
@@ -121,5 +135,6 @@ def byte_offset_of_match(ctx,
                 _match_bytes = bytes.fromhex(_match_str)
             else:
                 _match_bytes = _match_str.encode('utf8')
+            #found = find_byte_match_in_path(bytes_match=_match_bytes, bitstream=const_bitstream, verbose=verbose)
             found = const_bitstream.find(_match_bytes, bytealigned=byte_alinged)
             ic(found)
