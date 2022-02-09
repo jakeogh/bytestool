@@ -114,7 +114,7 @@ def byte_offset_of_match(ctx,
     for index, path in enumerate(iterator):
         if verbose:
             ic(index, path)
-            _path = Path(os.fsdecode(path))
+        _path = Path(os.fsdecode(path))
         const_bitstream = ConstBitStream(filename=_path)
         for _match_str in matches:
             if hexencoding:
