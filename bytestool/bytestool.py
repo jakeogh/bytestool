@@ -20,15 +20,12 @@
 # pylint: disable=W0201  # attribute defined outside __init__
 # pylint: disable=R0916  # Too many boolean expressions in if statement
 # pylint: disable=C0305  # Trailing newlines editor should fix automatically, pointless warning
-# pylint: disable=C0413  # TEMP isort issue [wrong-import-position] Import "from pathlib import Path" should be placed at the top of the module [C0413]
 
 import os
 from pathlib import Path
 from signal import SIG_DFL
 from signal import SIGPIPE
 from signal import signal
-#from typing import ByteString
-#from typing import Optional
 from typing import Iterator
 from typing import Union
 
@@ -41,14 +38,13 @@ from clicktool import click_global_options
 from clicktool import tv
 from unmp import unmp
 
-#this should be earlier in the imports, but isort stops working
 signal(SIGPIPE, SIG_DFL)
 
 
 @increment_debug
 def read_by_byte(file_object,
-                 byte,
-                 verbose: Union[bool, int],
+                 byte: bytes,
+                 verbose: Union[bool, int, float],
                  buffer_size: int = 1024,
                  ) -> Iterator[bytes]:    # orig by ikanobori
     if verbose:
@@ -74,20 +70,6 @@ def read_by_byte(file_object,
         yield buf
 
 
-@click.group()
-@click_add_options(click_global_options)
-@click.pass_context
-def cli(ctx,
-        verbose: int,
-        verbose_inf: bool,
-        ):
-
-    tty, verbose = tv(ctx=ctx,
-                      verbose=verbose,
-                      verbose_inf=verbose_inf,
-                      )
-
-
 def find_byte_match_in_path(*,
                             bytes_match: bytes,
                             path: Path,
@@ -100,6 +82,20 @@ def find_byte_match_in_path(*,
     const_bitstream = ConstBitStream(filename=path)
     found = const_bitstream.find(bytes_match, bytealigned=byte_alinged)
     return found
+
+
+@click.group()
+@click_add_options(click_global_options)
+@click.pass_context
+def cli(ctx,
+        verbose: int,
+        verbose_inf: bool,
+        ):
+
+    tty, verbose = tv(ctx=ctx,
+                      verbose=verbose,
+                      verbose_inf=verbose_inf,
+                      )
 
 
 @cli.command()
