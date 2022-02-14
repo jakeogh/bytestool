@@ -35,10 +35,10 @@ from typing import Union
 import click
 from asserttool import ic
 from asserttool import increment_debug
-from asserttool import tv
 from bitstring import ConstBitStream
 from clicktool import click_add_options
 from clicktool import click_global_options
+from clicktool import tv
 from unmp import unmp
 
 #this should be earlier in the imports, but isort stops working
