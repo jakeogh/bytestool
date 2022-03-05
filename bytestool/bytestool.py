@@ -186,9 +186,19 @@ class mask_byte_slices:
             # ic(to_eval)
             # eval(to_eval)
 
-            to_exec = f"self.mmfh{_slice} = 0"
-            ic(to_exec)
-            exec(to_exec)
+            ##to_exec = f"self.mmfh{_slice} = 0"
+            # to_exec = f"self.mmfh{_slice} = '0'.encode('utf8') * ()"
+            # ic(to_exec)
+            # exec(to_exec)
+
+            slice_object_to_eval = f"self.mmfh{_slice}"
+            ic(slice_object_to_eval)
+            slice_object = eval(slice_object_to_eval)
+            ic(slice_object)
+            slice_object_length = len(slice_object)
+            ic(slice_object_length)
+
+            # to_exec = "slice_object =
 
             ## IPython.embed()
             ### to_eval = f"mmfh{_slice} = " + """b'\\00'"""
