@@ -199,7 +199,7 @@ class mask_byte_slices:
                     # to_eval = f"epprint({to_eval})"
                     # ic(to_eval)
                     # eval(to_eval)
-                yield mmfh
+                return mmfh
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass
