@@ -168,7 +168,7 @@ def byte_offset_of_match(
             ic(found)
 
 
-class mask_byte_slices:
+class MaskedMMapOpen:
     def __init__(self, path: Path, slices: list[str], verbose: Union[bool, int, float]):
         self.path = path
         self.slices = slices
@@ -178,19 +178,6 @@ class mask_byte_slices:
         self.fh = open(self.path, "r+b")
         self.mmfh = mmap.mmap(self.fh.fileno(), 0, flags=mmap.MAP_PRIVATE)
         for _slice in self.slices:
-            # ic(len(bitstream), bitstream)
-            assert _slice.startswith("[")
-            assert _slice.endswith("]")
-            # to_eval = f"mmfh{_slice}"
-            # to_eval = f"epprint({to_eval})"
-            # ic(to_eval)
-            # eval(to_eval)
-
-            ##to_exec = f"self.mmfh{_slice} = 0"
-            # to_exec = f"self.mmfh{_slice} = '0'.encode('utf8') * ()"
-            # ic(to_exec)
-            # exec(to_exec)
-
             slice_object_to_eval = f"self.mmfh{_slice}"
             ic(slice_object_to_eval)
             slice_object = eval(slice_object_to_eval)
@@ -198,26 +185,14 @@ class mask_byte_slices:
             slice_object_length = len(slice_object)
             ic(slice_object_length)
 
-            # zero_bytes = b"0" * slice_object_length
             zero_bytes = f"bytes({slice_object_length})"
             ic(zero_bytes)
             to_exec = f"{slice_object_to_eval} = {zero_bytes}"
             to_exec = to_exec.encode("utf8")
             ic(to_exec)
-            assert isinstance(to_exec, bytes)
             exec(to_exec)
             ic(eval(slice_object_to_eval))
 
-            ## IPython.embed()
-            ### to_eval = f"mmfh{_slice} = " + """b'\\00'"""
-            ## to_eval = f"mmfh{_slice} = 0x00"
-            ## ic(to_eval)
-            ## eval(to_eval)
-
-            # to_eval = f"mmfh{_slice}"
-            # to_eval = f"epprint({to_eval})"
-            # ic(to_eval)
-            # eval(to_eval)
         return self.mmfh
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -250,16 +225,13 @@ def delete_byte_ranges(
         verbose=verbose,
     )
 
-    # iterator = [
-    #    b"2EbanrRUuy0.webm.header1",
-    # ]
     index = 0
     for index, path in enumerate(iterator):
         if verbose:
             ic(index, path)
         _path = Path(os.fsdecode(path))
 
-        with mask_byte_slices(path=_path, slices=slices, verbose=verbose) as fh:
+        with MaskedMMapOpen(path=_path, slices=slices, verbose=verbose) as fh:
             data = fh.read()
             ic(data)
             ic(data.hex())
