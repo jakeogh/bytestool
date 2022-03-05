@@ -226,15 +226,15 @@ def delete_byte_ranges(
     )
 
     iterator = unmp(
-       valid_types=[
-           bytes,
-       ],
-       verbose=verbose,
+        valid_types=[
+            bytes,
+        ],
+        verbose=verbose,
     )
 
-    #iterator = [
+    # iterator = [
     #    b"2EbanrRUuy0.webm.header1",
-    #]
+    # ]
     index = 0
     for index, path in enumerate(iterator):
         if verbose:
