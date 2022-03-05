@@ -167,6 +167,44 @@ def byte_offset_of_match(
             ic(found)
 
 
+class mask_byte_slices:
+    def __init__(self, path: Path, slices: list[str], verbose: Union[bool, int, float]):
+        self.path = path
+        self.slices = slices
+        self.verbose = verbose
+
+    def __enter__(self):
+        with open(self.path, "r+b") as fh:
+            with mmap.mmap(fh.fileno(), 0, flags=mmap.MAP_PRIVATE) as mmfh:
+                for _slice in self.slices:
+                    # ic(len(bitstream), bitstream)
+                    assert _slice.startswith("[")
+                    assert _slice.endswith("]")
+                    # to_eval = f"mmfh{_slice}"
+                    # to_eval = f"epprint({to_eval})"
+                    # ic(to_eval)
+                    # eval(to_eval)
+
+                    to_exec = f"mmfh{_slice} = 0"
+                    ic(to_exec)
+                    exec(to_exec)
+
+                    ## IPython.embed()
+                    ### to_eval = f"mmfh{_slice} = " + """b'\\00'"""
+                    ## to_eval = f"mmfh{_slice} = 0x00"
+                    ## ic(to_eval)
+                    ## eval(to_eval)
+
+                    # to_eval = f"mmfh{_slice}"
+                    # to_eval = f"epprint({to_eval})"
+                    # ic(to_eval)
+                    # eval(to_eval)
+                yield mmfh
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+
 @cli.command()
 @click.argument("slices", type=validate_slice, nargs=-1)
 @click_add_options(click_global_options)
@@ -200,31 +238,6 @@ def delete_byte_ranges(
         if verbose:
             ic(index, path)
         _path = Path(os.fsdecode(path))
-        # bitstream = BitStream(filename=_path)
-        with open(_path, "r+b") as fh:
-            with mmap.mmap(fh.fileno(), 0, flags=mmap.MAP_PRIVATE) as mmfh:
-                for _slice in slices:
-                    # ic(len(bitstream), bitstream)
-                    assert _slice.startswith("[")
-                    assert _slice.endswith("]")
-                    to_eval = f"mmfh{_slice}"
-                    to_eval = f"epprint({to_eval})"
-                    ic(to_eval)
-                    eval(to_eval)
 
-                    to_exec = f"mmfh{_slice} = 0"
-                    ic(to_exec)
-                    exec(to_exec)
-
-                    # IPython.embed()
-                    ## to_eval = f"mmfh{_slice} = " + """b'\\00'"""
-                    # to_eval = f"mmfh{_slice} = 0x00"
-                    # ic(to_eval)
-                    # eval(to_eval)
-
-                    to_eval = f"mmfh{_slice}"
-                    to_eval = f"epprint({to_eval})"
-                    ic(to_eval)
-                    eval(to_eval)
-                # ic(len(bitstream), bitstream)
-                # del const_bitstream
+        with mask_byte_slices(path=_path, slices=slices, verbose=verbose) as fh:
+            ic(fh.read())
