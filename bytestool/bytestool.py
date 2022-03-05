@@ -208,7 +208,9 @@ def delete_byte_ranges(
                     to_eval = f"epprint({to_eval})"
                     ic(to_eval)
                     eval(to_eval)
+                    import IPython
 
+                    IPython.embed()
                     # to_eval = f"mmfh{_slice} = " + """b'\\00'"""
                     to_eval = f"mmfh{_slice} = 0x00"
                     ic(to_eval)
