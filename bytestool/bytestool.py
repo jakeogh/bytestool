@@ -212,9 +212,9 @@ def delete_byte_ranges(
                     ic(to_eval)
                     eval(to_eval)
 
-                    to_eval = f"mmfh{_slice} = 0"
-                    ic(to_eval)
-                    eval(to_eval)
+                    to_exec = f"mmfh{_slice} = 0"
+                    ic(to_exec)
+                    exec(to_exec)
 
                     # IPython.embed()
                     ## to_eval = f"mmfh{_slice} = " + """b'\\00'"""
