@@ -167,12 +167,6 @@ def byte_offset_of_match(
 
 
 @cli.command()
-# @click.argument(
-#    "offsets",
-#    type=int,
-#    nargs=-1,
-#    required=True,
-# )
 @click.argument("slices", type=validate_slice, nargs=-1)
 @click_add_options(click_global_options)
 @click.pass_context
