@@ -21,6 +21,7 @@
 # pylint: disable=R0916  # Too many boolean expressions in if statement
 # pylint: disable=C0305  # Trailing newlines editor should fix automatically, pointless warning
 
+import mmap
 import os
 from pathlib import Path
 from signal import SIG_DFL
@@ -201,13 +202,15 @@ def delete_byte_ranges(
         if verbose:
             ic(index, path)
         _path = Path(os.fsdecode(path))
-        bitstream = BitStream(filename=_path)
-        for _slice in slices:
-            ic(len(bitstream), bitstream)
-            assert _slice.startswith("[")
-            assert _slice.endswith("]")
-            to_eval = f"del bitstream{_slice}"
-            ic(to_eval)
-            eval(to_eval)
-            ic(len(bitstream), bitstream)
-            # del const_bitstream
+        # bitstream = BitStream(filename=_path)
+        with open(_path, "rb") as fh:
+            with mmap.mmap(fh) as mmfh:
+                for _slice in slices:
+                    # ic(len(bitstream), bitstream)
+                    assert _slice.startswith("[")
+                    assert _slice.endswith("]")
+                    to_eval = f"(ic(mmfh{_slice})"
+                    ic(to_eval)
+                eval(to_eval)
+                # ic(len(bitstream), bitstream)
+                # del const_bitstream
