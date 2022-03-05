@@ -209,7 +209,7 @@ def delete_byte_ranges(
                     # ic(len(bitstream), bitstream)
                     assert _slice.startswith("[")
                     assert _slice.endswith("]")
-                    to_eval = f"(ic(mmfh{_slice})"
+                    to_eval = f"ic(mmfh{_slice})"
                     ic(to_eval)
                 eval(to_eval)
                 # ic(len(bitstream), bitstream)
