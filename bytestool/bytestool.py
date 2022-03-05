@@ -207,13 +207,15 @@ def delete_byte_ranges(
                     to_eval = f"mmfh{_slice}"
                     to_eval = f"epprint({to_eval})"
                     ic(to_eval)
+                    eval(to_eval)
 
                     to_eval = f"mmfh{_slice} = b'\00'"
                     ic(to_eval)
+                    eval(to_eval)
 
                     to_eval = f"mmfh{_slice}"
                     to_eval = f"epprint({to_eval})"
                     ic(to_eval)
-                eval(to_eval)
+                    eval(to_eval)
                 # ic(len(bitstream), bitstream)
                 # del const_bitstream
