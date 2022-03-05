@@ -96,6 +96,7 @@ def cli(
     ctx,
     verbose: Union[bool, int, float],
     verbose_inf: bool,
+    dict_input: bool,
 ):
 
     tty, verbose = tv(
@@ -130,6 +131,7 @@ def byte_offset_of_match(
     hexencoding: bool,
     verbose: Union[bool, int, float],
     verbose_inf: bool,
+    dict_input: bool,
 ):
 
     tty, verbose = tv(
@@ -177,6 +179,7 @@ def delete_byte_ranges(
     slices: tuple[str],
     verbose: Union[bool, int, float],
     verbose_inf: bool,
+    dict_input: bool,
 ):
 
     tty, verbose = tv(
@@ -201,4 +204,4 @@ def delete_byte_ranges(
         for _slice in slices:
             to_eval = f"BitArray[{_slice}]"
             ic(to_eval)
-            del const_bitstream
+            # del const_bitstream
