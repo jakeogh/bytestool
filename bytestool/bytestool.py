@@ -174,8 +174,8 @@ class mask_byte_slices:
         self.verbose = verbose
 
     def __enter__(self):
-        with open(self.path, "r+b") as fh:
-            with mmap.mmap(fh.fileno(), 0, flags=mmap.MAP_PRIVATE) as self.mmfh:
+        with open(self.path, "r+b") as self.fh:
+            with mmap.mmap(self.fh.fileno(), 0, flags=mmap.MAP_PRIVATE) as self.mmfh:
                 for _slice in self.slices:
                     # ic(len(bitstream), bitstream)
                     assert _slice.startswith("[")
