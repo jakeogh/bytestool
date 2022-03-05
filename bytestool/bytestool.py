@@ -209,7 +209,6 @@ def delete_byte_ranges(
                     ic(to_eval)
 
                     to_eval = f"mmfh{_slice} = b'\00'"
-                    to_eval = f"epprint({to_eval})"
                     ic(to_eval)
 
                     to_eval = f"mmfh{_slice}"
