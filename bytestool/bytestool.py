@@ -241,4 +241,6 @@ def delete_byte_ranges(
         _path = Path(os.fsdecode(path))
 
         with mask_byte_slices(path=_path, slices=slices, verbose=verbose) as fh:
-            ic(fh.read())
+            data = fh.read()
+            ic(data)
+            ic(data.hex())
