@@ -202,6 +202,7 @@ class mask_byte_slices:
             zero_bytes = f"bytes({slice_object_length})"
             ic(zero_bytes)
             to_exec = f"{slice_object_to_eval} = zero_bytes"
+            to_exec = to_exec.encode("utf8")
             ic(to_exec)
             exec(to_exec)
             ic(eval(slice_object_to_eval))
