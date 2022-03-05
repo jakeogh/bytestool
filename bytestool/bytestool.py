@@ -202,7 +202,7 @@ def delete_byte_ranges(
         _path = Path(os.fsdecode(path))
         # bitstream = BitStream(filename=_path)
         with open(_path, "r+b") as fh:
-            with mmap.mmap(fh.fileno(), 0) as mmfh:
+            with mmap.mmap(fh.fileno(), 0, flags=mmap.MAP_PRIVATE) as mmfh:
                 for _slice in slices:
                     # ic(len(bitstream), bitstream)
                     assert _slice.startswith("[")
@@ -214,10 +214,10 @@ def delete_byte_ranges(
                     import IPython
 
                     IPython.embed()
-                    # to_eval = f"mmfh{_slice} = " + """b'\\00'"""
-                    to_eval = f"mmfh{_slice} = 0x00"
-                    ic(to_eval)
-                    eval(to_eval)
+                    ## to_eval = f"mmfh{_slice} = " + """b'\\00'"""
+                    # to_eval = f"mmfh{_slice} = 0x00"
+                    # ic(to_eval)
+                    # eval(to_eval)
 
                     to_eval = f"mmfh{_slice}"
                     to_eval = f"epprint({to_eval})"
