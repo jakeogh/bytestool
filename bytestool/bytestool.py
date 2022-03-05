@@ -205,7 +205,7 @@ def delete_byte_ranges(
         for _slice in slices:
             ic(len(bitstream), bitstream)
             assert _slice.startswith("[")
-            assert _slice.endsswith("]")
+            assert _slice.endswith("]")
             to_eval = f"del bitstream{_slice}"
             ic(to_eval)
             eval(to_eval)
