@@ -185,7 +185,7 @@ class mask_byte_slices:
                     # ic(to_eval)
                     # eval(to_eval)
 
-                    to_exec = f"mmfh{_slice} = 0"
+                    to_exec = f"self.mmfh{_slice} = 0"
                     ic(to_exec)
                     exec(to_exec)
 
