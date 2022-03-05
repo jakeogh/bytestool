@@ -42,6 +42,7 @@ from clicktool import click_add_options
 from clicktool import click_global_options
 from clicktool import tv
 from epprint import epprint
+from mptool import output
 from mptool import unmp
 
 signal(SIGPIPE, SIG_DFL)
@@ -244,3 +245,4 @@ def delete_byte_ranges(
             data = fh.read()
             ic(data)
             ic(data.hex())
+            output(data, reason=path, tty=tty, verbose=verbose, dict_input=dict_input)
