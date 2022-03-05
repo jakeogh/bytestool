@@ -203,7 +203,7 @@ class mask_byte_slices:
             to_exec = f"{slice_object_to_eval} = zero_bytes"
             ic(to_exec)
             exec(to_exec)
-            ic(slice_object)
+            ic(eval(slice_object_to_eval))
 
             ## IPython.embed()
             ### to_eval = f"mmfh{_slice} = " + """b'\\00'"""
