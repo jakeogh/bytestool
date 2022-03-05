@@ -174,34 +174,35 @@ class mask_byte_slices:
         self.verbose = verbose
 
     def __enter__(self):
-        with open(self.path, "r+b") as self.fh:
-            with mmap.mmap(self.fh.fileno(), 0, flags=mmap.MAP_PRIVATE) as self.mmfh:
-                for _slice in self.slices:
-                    # ic(len(bitstream), bitstream)
-                    assert _slice.startswith("[")
-                    assert _slice.endswith("]")
-                    # to_eval = f"mmfh{_slice}"
-                    # to_eval = f"epprint({to_eval})"
-                    # ic(to_eval)
-                    # eval(to_eval)
+        self.fh = open(self.path, "r+b")
+        with mmap.mmap(self.fh.fileno(), 0, flags=mmap.MAP_PRIVATE) as self.mmfh:
+            for _slice in self.slices:
+                # ic(len(bitstream), bitstream)
+                assert _slice.startswith("[")
+                assert _slice.endswith("]")
+                # to_eval = f"mmfh{_slice}"
+                # to_eval = f"epprint({to_eval})"
+                # ic(to_eval)
+                # eval(to_eval)
 
-                    to_exec = f"self.mmfh{_slice} = 0"
-                    ic(to_exec)
-                    exec(to_exec)
+                to_exec = f"self.mmfh{_slice} = 0"
+                ic(to_exec)
+                exec(to_exec)
 
-                    ## IPython.embed()
-                    ### to_eval = f"mmfh{_slice} = " + """b'\\00'"""
-                    ## to_eval = f"mmfh{_slice} = 0x00"
-                    ## ic(to_eval)
-                    ## eval(to_eval)
+                ## IPython.embed()
+                ### to_eval = f"mmfh{_slice} = " + """b'\\00'"""
+                ## to_eval = f"mmfh{_slice} = 0x00"
+                ## ic(to_eval)
+                ## eval(to_eval)
 
-                    # to_eval = f"mmfh{_slice}"
-                    # to_eval = f"epprint({to_eval})"
-                    # ic(to_eval)
-                    # eval(to_eval)
-                return self.mmfh
+                # to_eval = f"mmfh{_slice}"
+                # to_eval = f"epprint({to_eval})"
+                # ic(to_eval)
+                # eval(to_eval)
+            return self.mmfh
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        self.fh.close()
         pass
 
 
