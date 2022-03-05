@@ -201,8 +201,13 @@ def delete_byte_ranges(
         if verbose:
             ic(index, path)
         _path = Path(os.fsdecode(path))
-        const_bitstream = BitStream(filename=_path)
+        bitstream = BitStream(filename=_path)
         for _slice in slices:
-            to_eval = f"BitArray[{_slice}]"
+            ic(len(bitstream), bitstream)
+            assert _slice.startswith("[")
+            assert _slice.endsswith("]")
+            to_eval = f"del bitstream{_slice}"
             ic(to_eval)
+            eval(to_eval)
+            ic(len(bitstream), bitstream)
             # del const_bitstream
