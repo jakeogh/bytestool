@@ -175,7 +175,7 @@ class mask_byte_slices:
 
     def __enter__(self):
         with open(self.path, "r+b") as fh:
-            with mmap.mmap(fh.fileno(), 0, flags=mmap.MAP_PRIVATE) as mmfh:
+            with mmap.mmap(fh.fileno(), 0, flags=mmap.MAP_PRIVATE) as self.mmfh:
                 for _slice in self.slices:
                     # ic(len(bitstream), bitstream)
                     assert _slice.startswith("[")
@@ -199,7 +199,7 @@ class mask_byte_slices:
                     # to_eval = f"epprint({to_eval})"
                     # ic(to_eval)
                     # eval(to_eval)
-                return mmfh
+                return self.mmfh
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass
