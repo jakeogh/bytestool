@@ -34,6 +34,7 @@ from asserttool import ic
 from asserttool import increment_debug
 from asserttool import validate_slice
 from bitstring import BitArray
+from bitstring import BitStream
 from bitstring import \
     ConstBitStream  # https://github.com/scott-griffiths/bitstring
 from clicktool import click_add_options
@@ -200,7 +201,7 @@ def delete_byte_ranges(
         if verbose:
             ic(index, path)
         _path = Path(os.fsdecode(path))
-        const_bitstream = ConstBitStream(filename=_path)
+        const_bitstream = BitStream(filename=_path)
         for _slice in slices:
             to_eval = f"BitArray[{_slice}]"
             ic(to_eval)
