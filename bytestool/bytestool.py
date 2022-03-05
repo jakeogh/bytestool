@@ -204,7 +204,7 @@ def delete_byte_ranges(
         _path = Path(os.fsdecode(path))
         # bitstream = BitStream(filename=_path)
         with open(_path, "rb") as fh:
-            with mmap.mmap(fh) as mmfh:
+            with mmap.mmap(fh.fileno(), 0) as mmfh:
                 for _slice in slices:
                     # ic(len(bitstream), bitstream)
                     assert _slice.startswith("[")
