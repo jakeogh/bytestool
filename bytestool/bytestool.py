@@ -200,7 +200,7 @@ class mask_byte_slices:
 
             zero_bytes = b"0" * slice_object_length
             ic(zero_bytes)
-            to_exec = "slice_object = zero_bytes"
+            to_exec = "slice_object_to_eval = zero_bytes"
             ic(to_exec)
             exec(to_exec)
             ic(slice_object)
