@@ -198,7 +198,8 @@ class mask_byte_slices:
             slice_object_length = len(slice_object)
             ic(slice_object_length)
 
-            zero_bytes = b"0" * slice_object_length
+            # zero_bytes = b"0" * slice_object_length
+            zero_bytes = f"bytes({slice_object_length})"
             ic(zero_bytes)
             to_exec = f"{slice_object_to_eval} = zero_bytes"
             ic(to_exec)
