@@ -209,7 +209,8 @@ def delete_byte_ranges(
                     ic(to_eval)
                     eval(to_eval)
 
-                    to_eval = f"mmfh{_slice} = " + """b'\\00'"""
+                    # to_eval = f"mmfh{_slice} = " + """b'\\00'"""
+                    to_eval = f"mmfh{_slice} = 0x00"
                     ic(to_eval)
                     eval(to_eval)
 
