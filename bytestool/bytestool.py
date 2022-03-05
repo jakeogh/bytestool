@@ -32,21 +32,25 @@ from typing import Union
 import click
 from asserttool import ic
 from asserttool import increment_debug
-from bitstring import ConstBitStream
+from asserttool import validate_slice
+from bitstring import BitArray
+from bitstring import \
+    ConstBitStream  # https://github.com/scott-griffiths/bitstring
 from clicktool import click_add_options
 from clicktool import click_global_options
 from clicktool import tv
-from unmp import unmp
+from mptool import unmp
 
 signal(SIGPIPE, SIG_DFL)
 
 
 @increment_debug
-def read_by_byte(file_object,
-                 byte: bytes,
-                 verbose: Union[bool, int, float],
-                 buffer_size: int = 1024,
-                 ) -> Iterator[bytes]:    # orig by ikanobori
+def read_by_byte(
+    file_object,
+    byte: bytes,
+    verbose: Union[bool, int, float],
+    buffer_size: int = 1024,
+) -> Iterator[bytes]:  # orig by ikanobori
     if verbose:
         ic(byte)
     buf = b""
@@ -60,22 +64,23 @@ def read_by_byte(file_object,
 
         ret = None
         while sep != -1:
-            ret, buf = buf[:sep], buf[sep + 1:]
+            ret, buf = buf[:sep], buf[sep + 1 :]
             yield ret
             sep = buf.find(byte)
 
     if verbose > 2:
-        ic('fell off end:', ret, buf)
+        ic("fell off end:", ret, buf)
     if buf:
         yield buf
 
 
-def find_byte_match_in_path(*,
-                            bytes_match: bytes,
-                            path: Path,
-                            byte_alinged: bool,
-                            verbose: int,
-                            ) -> tuple[int]:
+def find_byte_match_in_path(
+    *,
+    bytes_match: bytes,
+    path: Path,
+    byte_alinged: bool,
+    verbose: Union[bool, int, float],
+) -> tuple[int]:
 
     if verbose:
         ic(path, bytes_match, byte_alinged)
@@ -84,41 +89,62 @@ def find_byte_match_in_path(*,
     return found
 
 
-@click.group()
+@click.group(no_args_is_help=True)
 @click_add_options(click_global_options)
 @click.pass_context
-def cli(ctx,
-        verbose: int,
-        verbose_inf: bool,
-        ):
+def cli(
+    ctx,
+    verbose: Union[bool, int, float],
+    verbose_inf: bool,
+):
 
-    tty, verbose = tv(ctx=ctx,
-                      verbose=verbose,
-                      verbose_inf=verbose_inf,
-                      )
+    tty, verbose = tv(
+        ctx=ctx,
+        verbose=verbose,
+        verbose_inf=verbose_inf,
+    )
 
 
 @cli.command()
-@click.argument("matches", type=str, nargs=-1, required=True,)
-@click.option('--not-byte-alinged', is_flag=True,)
-@click.option('--hex', 'hexencoding', is_flag=True,)
+@click.argument(
+    "matches",
+    type=str,
+    nargs=-1,
+    required=True,
+)
+@click.option(
+    "--not-byte-alinged",
+    is_flag=True,
+)
+@click.option(
+    "--hex",
+    "hexencoding",
+    is_flag=True,
+)
 @click_add_options(click_global_options)
 @click.pass_context
-def byte_offset_of_match(ctx,
-                         matches: tuple[str],
-                         not_byte_alinged: bool,
-                         hexencoding: bool,
-                         verbose: int,
-                         verbose_inf: bool,
-                         ):
+def byte_offset_of_match(
+    ctx,
+    matches: tuple[str],
+    not_byte_alinged: bool,
+    hexencoding: bool,
+    verbose: Union[bool, int, float],
+    verbose_inf: bool,
+):
 
-    tty, verbose = tv(ctx=ctx,
-                      verbose=verbose,
-                      verbose_inf=verbose_inf,
-                      )
+    tty, verbose = tv(
+        ctx=ctx,
+        verbose=verbose,
+        verbose_inf=verbose_inf,
+    )
 
     byte_alinged = not not_byte_alinged
-    iterator = unmp(valid_types=[bytes,], verbose=verbose)
+    iterator = unmp(
+        valid_types=[
+            bytes,
+        ],
+        verbose=verbose,
+    )
 
     index = 0
     for index, path in enumerate(iterator):
@@ -130,7 +156,49 @@ def byte_offset_of_match(ctx,
             if hexencoding:
                 _match_bytes = bytes.fromhex(_match_str)
             else:
-                _match_bytes = _match_str.encode('utf8')
-            #found = find_byte_match_in_path(bytes_match=_match_bytes, bitstream=const_bitstream, verbose=verbose)
+                _match_bytes = _match_str.encode("utf8")
+            # found = find_byte_match_in_path(bytes_match=_match_bytes, bitstream=const_bitstream, verbose=verbose)
             found = const_bitstream.find(_match_bytes, bytealigned=byte_alinged)
             ic(found)
+
+
+@cli.command()
+# @click.argument(
+#    "offsets",
+#    type=int,
+#    nargs=-1,
+#    required=True,
+# )
+@click.argument("slices", type=validate_slice, nargs=-1)
+@click_add_options(click_global_options)
+@click.pass_context
+def delete_byte_ranges(
+    ctx,
+    slices: tuple[str],
+    verbose: Union[bool, int, float],
+    verbose_inf: bool,
+):
+
+    tty, verbose = tv(
+        ctx=ctx,
+        verbose=verbose,
+        verbose_inf=verbose_inf,
+    )
+
+    iterator = unmp(
+        valid_types=[
+            bytes,
+        ],
+        verbose=verbose,
+    )
+
+    index = 0
+    for index, path in enumerate(iterator):
+        if verbose:
+            ic(index, path)
+        _path = Path(os.fsdecode(path))
+        const_bitstream = ConstBitStream(filename=_path)
+        for _slice in slices:
+            to_eval = f"BitArray[{_slice}]"
+            ic(to_eval)
+            del const_bitstream
