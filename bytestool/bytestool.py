@@ -34,14 +34,14 @@ import click
 from asserttool import ic
 from asserttool import increment_debug
 from asserttool import validate_slice
-from bitstring import BitArray
-from bitstring import BitStream
+# from bitstring import BitArray
+# from bitstring import BitStream
 from bitstring import \
     ConstBitStream  # https://github.com/scott-griffiths/bitstring
 from clicktool import click_add_options
 from clicktool import click_global_options
 from clicktool import tv
-from epprint import epprint
+# from epprint import epprint
 from mptool import output
 from mptool import unmp
 
