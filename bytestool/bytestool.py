@@ -31,7 +31,6 @@ from signal import signal
 
 import click
 from asserttool import ic
-from asserttool import increment_debug
 from asserttool import validate_slice
 from bitstring import \
     ConstBitStream  # https://github.com/scott-griffiths/bitstring
@@ -48,7 +47,6 @@ from unmp import unmp
 signal(SIGPIPE, SIG_DFL)
 
 
-@increment_debug
 def read_by_byte(
     file_object,
     byte: bytes,
@@ -224,7 +222,6 @@ def delete_byte_ranges(
         ],
         verbose=verbose,
     )
-
     index = 0
     for index, path in enumerate(iterator):
         if verbose:
