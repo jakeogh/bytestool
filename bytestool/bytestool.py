@@ -50,7 +50,7 @@ signal(SIGPIPE, SIG_DFL)
 def read_by_byte(
     file_object,
     byte: bytes,
-    verbose: bool | int | float,
+    verbose: bool | int | float = False,
     buffer_size: int = 1024,
 ) -> Iterator[bytes]:  # orig by ikanobori
     if verbose:
@@ -81,9 +81,8 @@ def find_byte_match_in_path(
     bytes_match: bytes,
     path: Path,
     byte_alinged: bool,
-    verbose: bool | int | float,
+    verbose: bool | int | float = False,
 ) -> tuple[int]:
-
     if verbose:
         ic(path, bytes_match, byte_alinged)
     const_bitstream = ConstBitStream(filename=path)
@@ -96,11 +95,10 @@ def find_byte_match_in_path(
 @click.pass_context
 def cli(
     ctx,
-    verbose: bool | int | float,
     verbose_inf: bool,
     dict_output: bool,
+    verbose: bool | int | float = False,
 ):
-
     tty, verbose = tv(
         ctx=ctx,
         verbose=verbose,
@@ -128,14 +126,13 @@ def cli(
 @click.pass_context
 def byte_offset_of_match(
     ctx,
-    matches: tuple[str],
+    matches: tuple[str, ...],
     not_byte_alinged: bool,
     hexencoding: bool,
-    verbose: bool | int | float,
     verbose_inf: bool,
     dict_output: bool,
+    verbose: bool | int | float = False,
 ):
-
     tty, verbose = tv(
         ctx=ctx,
         verbose=verbose,
@@ -204,12 +201,11 @@ class MaskedMMapOpen:
 @click.pass_context
 def delete_byte_ranges(
     ctx,
-    slices: tuple[str],
-    verbose: bool | int | float,
+    slices: tuple[str, ...],
     verbose_inf: bool,
     dict_output: bool,
+    verbose: bool | int | float = False,
 ):
-
     tty, verbose = tv(
         ctx=ctx,
         verbose=verbose,
