@@ -219,8 +219,8 @@ def byte_offset_of_match(
 
 @cli.command()
 @click.argument("hex_str", type=str, nargs=1)
-@click.argument("--prefix", type=str)
-@click.argument("--postfix", type=str)
+@click.option("--prefix", type=str)
+@click.option("--postfix", type=str)
 @click_add_options(click_global_options)
 @click.pass_context
 def hex_to_bytes(
