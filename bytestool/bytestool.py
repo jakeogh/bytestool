@@ -219,11 +219,15 @@ def byte_offset_of_match(
 
 @cli.command()
 @click.argument("hex_str", type=str, nargs=1)
+@click.argument("--prefix", type=str)
+@click.argument("--postfix", type=str)
 @click_add_options(click_global_options)
 @click.pass_context
 def hex_to_bytes(
     ctx,
     hex_str: str,
+    prefix: None | str,
+    postfix: None | str,
     verbose_inf: bool,
     dict_output: bool,
     verbose: bool = False,
@@ -252,7 +256,13 @@ def hex_to_bytes(
     #    ic(index, path)
     #    _path = Path(os.fsdecode(path))
 
-    _bytes = unhexlify(hex_str)
+    _hex = hex_str
+    if prefix:
+        _hex = prefix + hex_str
+    if postfix:
+        _hex = hex_str + postfix
+
+    _bytes = unhexlify(_hex)
     icp(_bytes)
 
 
