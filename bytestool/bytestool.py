@@ -258,9 +258,9 @@ def hex_to_bytes(
 
     _hex = hex_str
     if prefix:
-        _hex = prefix + hex_str
+        _hex = prefix + _hex
     if postfix:
-        _hex = hex_str + postfix
+        _hex = _hex + postfix
 
     _bytes = unhexlify(_hex)
     icp(_bytes)
