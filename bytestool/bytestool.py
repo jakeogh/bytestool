@@ -254,3 +254,47 @@ def hex_to_bytes(
 
     _bytes = unhexlify(hex_str)
     icp(_bytes)
+
+
+@cli.command()
+@click.argument("slices", type=validate_slice, nargs=-1)
+@click_add_options(click_global_options)
+@click.pass_context
+def delete_byte_ranges(
+    ctx,
+    slices: tuple[str, ...],
+    verbose_inf: bool,
+    dict_output: bool,
+    verbose: bool | int | float = False,
+):
+    tty, verbose = tv(
+        ctx=ctx,
+        verbose=verbose,
+        verbose_inf=verbose_inf,
+    )
+
+    if not verbose:
+        ic.disable()
+    else:
+        ic.enable()
+
+    if verbose_inf:
+        gvd.enable()
+
+    iterator = unmp(
+        valid_types=[
+            bytes,
+        ],
+        verbose=verbose,
+    )
+    index = 0
+    for index, path in enumerate(iterator):
+        if verbose:
+            ic(index, path)
+        _path = Path(os.fsdecode(path))
+
+        with MaskedMMapOpen(path=_path, slices=slices, verbose=verbose) as fh:
+            data = fh.read()
+            ic(data)
+            ic(data.hex())
+            output(data, reason=path, tty=tty, verbose=verbose, dict_output=dict_output)
