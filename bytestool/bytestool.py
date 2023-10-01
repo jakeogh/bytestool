@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import mmap
 import os
+from binascii import unhexlify
 from collections.abc import Iterator
 from pathlib import Path
 from signal import SIG_DFL
@@ -31,6 +32,7 @@ from signal import signal
 
 import click
 from asserttool import ic
+from asserttool import icp
 from asserttool import validate_slice
 from bitstring import \
     ConstBitStream  # https://github.com/scott-griffiths/bitstring
@@ -38,6 +40,7 @@ from click_auto_help import AHGroup
 from clicktool import click_add_options
 from clicktool import click_global_options
 from clicktool import tv
+from globalverbose import gvd
 from mptool import output
 from unmp import unmp
 
@@ -47,124 +50,13 @@ from unmp import unmp
 signal(SIGPIPE, SIG_DFL)
 
 
-def read_by_byte(
-    file_object,
-    byte: bytes,
-    verbose: bool | int | float = False,
-    buffer_size: int = 1024,
-) -> Iterator[bytes]:  # orig by ikanobori
-    if verbose:
-        ic(byte)
-    buf = b""
-    for chunk in iter(lambda: file_object.read(buffer_size), b""):
-        if verbose > 2:
-            ic(chunk)
-        buf += chunk
-        sep = buf.find(byte)
-        if verbose > 2:
-            ic(buf, sep)
-
-        ret = None
-        while sep != -1:
-            ret, buf = buf[:sep], buf[sep + 1 :]
-            yield ret
-            sep = buf.find(byte)
-
-    if verbose > 2:
-        ic("fell off end:", ret, buf)
-    if buf:
-        yield buf
-
-
-def find_byte_match_in_path(
-    *,
-    bytes_match: bytes,
-    path: Path,
-    byte_alinged: bool,
-    verbose: bool | int | float = False,
-) -> tuple[int]:
-    if verbose:
-        ic(path, bytes_match, byte_alinged)
-    const_bitstream = ConstBitStream(filename=path)
-    found = const_bitstream.find(bytes_match, bytealigned=byte_alinged)
-    return found
-
-
-@click.group(no_args_is_help=True, cls=AHGroup)
-@click_add_options(click_global_options)
-@click.pass_context
-def cli(
-    ctx,
-    verbose_inf: bool,
-    dict_output: bool,
-    verbose: bool | int | float = False,
-):
-    tty, verbose = tv(
-        ctx=ctx,
-        verbose=verbose,
-        verbose_inf=verbose_inf,
-    )
-
-
-@cli.command()
-@click.argument(
-    "matches",
-    type=str,
-    nargs=-1,
-    required=True,
-)
-@click.option(
-    "--not-byte-alinged",
-    is_flag=True,
-)
-@click.option(
-    "--hex",
-    "hexencoding",
-    is_flag=True,
-)
-@click_add_options(click_global_options)
-@click.pass_context
-def byte_offset_of_match(
-    ctx,
-    matches: tuple[str, ...],
-    not_byte_alinged: bool,
-    hexencoding: bool,
-    verbose_inf: bool,
-    dict_output: bool,
-    verbose: bool | int | float = False,
-):
-    tty, verbose = tv(
-        ctx=ctx,
-        verbose=verbose,
-        verbose_inf=verbose_inf,
-    )
-
-    byte_alinged = not not_byte_alinged
-    iterator = unmp(
-        valid_types=[
-            bytes,
-        ],
-        verbose=verbose,
-    )
-
-    index = 0
-    for index, path in enumerate(iterator):
-        if verbose:
-            ic(index, path)
-        _path = Path(os.fsdecode(path))
-        const_bitstream = ConstBitStream(filename=_path)
-        for _match_str in matches:
-            if hexencoding:
-                _match_bytes = bytes.fromhex(_match_str)
-            else:
-                _match_bytes = _match_str.encode("utf8")
-            # found = find_byte_match_in_path(bytes_match=_match_bytes, bitstream=const_bitstream, verbose=verbose)
-            found = const_bitstream.find(_match_bytes, bytealigned=byte_alinged)
-            ic(found)
-
-
 class MaskedMMapOpen:
-    def __init__(self, path: Path, slices: list[str], verbose: bool | int | float):
+    def __init__(
+        self,
+        path: Path,
+        slices: list[str],
+        verbose: bool = False,
+    ):
         self.path = path
         self.slices = slices
         self.verbose = verbose
@@ -195,16 +87,99 @@ class MaskedMMapOpen:
         self.fh.close()
 
 
-@cli.command()
-@click.argument("slices", type=validate_slice, nargs=-1)
+def read_by_byte(
+    file_object,
+    byte: bytes,
+    verbose: bool = False,
+    buffer_size: int = 1024,
+) -> Iterator[bytes]:  # orig by ikanobori
+    ic(byte)
+    buf = b""
+    for chunk in iter(lambda: file_object.read(buffer_size), b""):
+        ic(chunk)
+        buf += chunk
+        sep = buf.find(byte)
+        ic(buf, sep)
+
+        ret = None
+        while sep != -1:
+            ret, buf = buf[:sep], buf[sep + 1 :]
+            yield ret
+            sep = buf.find(byte)
+
+    ic("fell off end:", ret, buf)
+    if buf:
+        yield buf
+
+
+def find_byte_match_in_path(
+    *,
+    bytes_match: bytes,
+    path: Path,
+    byte_alinged: bool,
+    verbose: bool = False,
+) -> tuple[int]:
+    ic(path, bytes_match, byte_alinged)
+    const_bitstream = ConstBitStream(filename=path)
+    found = const_bitstream.find(bytes_match, bytealigned=byte_alinged)
+    return found
+
+
+@click.group(no_args_is_help=True, cls=AHGroup)
 @click_add_options(click_global_options)
 @click.pass_context
-def delete_byte_ranges(
+def cli(
     ctx,
-    slices: tuple[str, ...],
     verbose_inf: bool,
     dict_output: bool,
-    verbose: bool | int | float = False,
+    verbose: bool = False,
+):
+    tty, verbose = tv(
+        ctx=ctx,
+        verbose=verbose,
+        verbose_inf=verbose_inf,
+    )
+    tty, verbose = tv(
+        ctx=ctx,
+        verbose=verbose,
+        verbose_inf=verbose_inf,
+    )
+
+    if not verbose:
+        ic.disable()
+    else:
+        ic.enable()
+
+    if verbose_inf:
+        gvd.enable()
+
+
+@cli.command()
+@click.argument(
+    "matches",
+    type=str,
+    nargs=-1,
+    required=True,
+)
+@click.option(
+    "--not-byte-alinged",
+    is_flag=True,
+)
+@click.option(
+    "--hex",
+    "hexencoding",
+    is_flag=True,
+)
+@click_add_options(click_global_options)
+@click.pass_context
+def byte_offset_of_match(
+    ctx,
+    matches: tuple[str, ...],
+    not_byte_alinged: bool,
+    hexencoding: bool,
+    verbose_inf: bool,
+    dict_output: bool,
+    verbose: bool = False,
 ):
     tty, verbose = tv(
         ctx=ctx,
@@ -212,20 +187,70 @@ def delete_byte_ranges(
         verbose_inf=verbose_inf,
     )
 
+    if not verbose:
+        ic.disable()
+    else:
+        ic.enable()
+
+    if verbose_inf:
+        gvd.enable()
+
+    byte_alinged = not not_byte_alinged
     iterator = unmp(
         valid_types=[
             bytes,
         ],
-        verbose=verbose,
     )
+
     index = 0
     for index, path in enumerate(iterator):
-        if verbose:
-            ic(index, path)
+        ic(index, path)
         _path = Path(os.fsdecode(path))
+        const_bitstream = ConstBitStream(filename=_path)
+        for _match_str in matches:
+            if hexencoding:
+                _match_bytes = bytes.fromhex(_match_str)
+            else:
+                _match_bytes = _match_str.encode("utf8")
+            # found = find_byte_match_in_path(bytes_match=_match_bytes, bitstream=const_bitstream,)
+            found = const_bitstream.find(_match_bytes, bytealigned=byte_alinged)
+            ic(found)
 
-        with MaskedMMapOpen(path=_path, slices=slices, verbose=verbose) as fh:
-            data = fh.read()
-            ic(data)
-            ic(data.hex())
-            output(data, reason=path, tty=tty, verbose=verbose, dict_output=dict_output)
+
+@cli.command()
+@click.argument("hex", "hex_str", type=validate_slice, nargs=1)
+@click_add_options(click_global_options)
+@click.pass_context
+def hex_to_bytes(
+    ctx,
+    hex_str: str,
+    verbose_inf: bool,
+    dict_output: bool,
+    verbose: bool = False,
+):
+    tty, verbose = tv(
+        ctx=ctx,
+        verbose=verbose,
+        verbose_inf=verbose_inf,
+    )
+
+    if not verbose:
+        ic.disable()
+    else:
+        ic.enable()
+
+    if verbose_inf:
+        gvd.enable()
+
+    # iterator = unmp(
+    #    valid_types=[
+    #        bytes,
+    #    ],
+    # )
+    # index = 0
+    # for index, _hex in enumerate(iterator):
+    #    ic(index, path)
+    #    _path = Path(os.fsdecode(path))
+
+    _bytes = unhexlify(hex_str)
+    icp(_bytes)
