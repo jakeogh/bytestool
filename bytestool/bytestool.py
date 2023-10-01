@@ -264,6 +264,7 @@ def hex_to_bytes(
 
     _bytes = unhexlify(_hex)
     icp(_bytes)
+    output(_bytes, reason=None, tty=tty, verbose=verbose, dict_output=dict_output)
 
 
 @cli.command()
