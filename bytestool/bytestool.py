@@ -265,7 +265,7 @@ def delete_byte_ranges(
     slices: tuple[str, ...],
     verbose_inf: bool,
     dict_output: bool,
-    verbose: bool | int | float = False,
+    verbose: bool = False,
 ):
     tty, verbose = tv(
         ctx=ctx,
@@ -293,7 +293,10 @@ def delete_byte_ranges(
             ic(index, path)
         _path = Path(os.fsdecode(path))
 
-        with MaskedMMapOpen(path=_path, slices=slices, verbose=verbose) as fh:
+        with MaskedMMapOpen(
+            path=_path,
+            slices=slices,
+        ) as fh:
             data = fh.read()
             ic(data)
             ic(data.hex())
