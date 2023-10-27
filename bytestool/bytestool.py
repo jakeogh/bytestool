@@ -39,7 +39,7 @@ from bitstring import \
 from click_auto_help import AHGroup
 from clicktool import click_add_options
 from clicktool import click_global_options
-from clicktool import tv
+from clicktool import tvicgvd
 from globalverbose import gvd
 from mptool import output
 from unmp import unmp
@@ -134,24 +134,20 @@ def cli(
     dict_output: bool,
     verbose: bool = False,
 ):
-    tty, verbose = tv(
+    tty, verbose = tvicgvd(
         ctx=ctx,
         verbose=verbose,
         verbose_inf=verbose_inf,
+        ic=ic,
+        gvd=gvd,
     )
-    tty, verbose = tv(
+    tty, verbose = tvicgvd(
         ctx=ctx,
         verbose=verbose,
         verbose_inf=verbose_inf,
+        ic=ic,
+        gvd=gvd,
     )
-
-    if not verbose:
-        ic.disable()
-    else:
-        ic.enable()
-
-    if verbose_inf:
-        gvd.enable()
 
 
 @cli.command()
@@ -181,19 +177,13 @@ def byte_offset_of_match(
     dict_output: bool,
     verbose: bool = False,
 ):
-    tty, verbose = tv(
+    tty, verbose = tvicgvd(
         ctx=ctx,
         verbose=verbose,
         verbose_inf=verbose_inf,
+        ic=ic,
+        gvd=gvd,
     )
-
-    if not verbose:
-        ic.disable()
-    else:
-        ic.enable()
-
-    if verbose_inf:
-        gvd.enable()
 
     byte_alinged = not not_byte_alinged
     iterator = unmp(
@@ -232,19 +222,13 @@ def hex_to_bytes(
     dict_output: bool,
     verbose: bool = False,
 ):
-    tty, verbose = tv(
+    tty, verbose = tvicgvd(
         ctx=ctx,
         verbose=verbose,
         verbose_inf=verbose_inf,
+        ic=ic,
+        gvd=gvd,
     )
-
-    if not verbose:
-        ic.disable()
-    else:
-        ic.enable()
-
-    if verbose_inf:
-        gvd.enable()
 
     # iterator = unmp(
     #    valid_types=[
@@ -264,7 +248,7 @@ def hex_to_bytes(
 
     _bytes = unhexlify(_hex)
     icp(_bytes)
-    output(_bytes, reason=None, tty=tty, verbose=verbose, dict_output=dict_output)
+    output(_bytes, reason=None, tty=tty, dict_output=dict_output)
 
 
 @cli.command()
@@ -278,19 +262,13 @@ def delete_byte_ranges(
     dict_output: bool,
     verbose: bool = False,
 ):
-    tty, verbose = tv(
+    tty, verbose = tvicgvd(
         ctx=ctx,
         verbose=verbose,
         verbose_inf=verbose_inf,
+        ic=ic,
+        gvd=gvd,
     )
-
-    if not verbose:
-        ic.disable()
-    else:
-        ic.enable()
-
-    if verbose_inf:
-        gvd.enable()
 
     iterator = unmp(
         valid_types=[
@@ -300,8 +278,7 @@ def delete_byte_ranges(
     )
     index = 0
     for index, path in enumerate(iterator):
-        if verbose:
-            ic(index, path)
+        ic(index, path)
         _path = Path(os.fsdecode(path))
 
         with MaskedMMapOpen(
@@ -311,4 +288,4 @@ def delete_byte_ranges(
             data = fh.read()
             ic(data)
             ic(data.hex())
-            output(data, reason=path, tty=tty, verbose=verbose, dict_output=dict_output)
+            output(data, reason=path, tty=tty, dict_output=dict_output)
