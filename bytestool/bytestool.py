@@ -110,7 +110,12 @@ def read_by_byte(
             yield ret
             sep = buf.find(byte)
 
-    ic("fell off end:", ret, buf)
+    ic("fell off end:")
+    try:
+        ic(ret, buf)
+    except UnboundLocalError:
+        pass
+
     if buf:
         yield buf
 
