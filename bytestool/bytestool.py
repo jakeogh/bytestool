@@ -93,10 +93,10 @@ def read_by_byte(
     verbose: bool = False,
     buffer_size: int = 1024,
 ) -> Iterator[bytes]:  # orig by ikanobori
-    ic(byte)
     # this is called by nl2mp
     if not verbose:
         ic.disable()
+    ic(byte)
     buf = b""
     for chunk in iter(lambda: file_object.read(buffer_size), b""):
         ic(chunk)
