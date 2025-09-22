@@ -33,19 +33,19 @@ from signal import signal
 import click
 from asserttool import ic
 from asserttool import icp
-from asserttool import validate_slice
-from bitstring import \
-    ConstBitStream  # https://github.com/scott-griffiths/bitstring
+from bitstring import ConstBitStream
 from click_auto_help import AHGroup
 from clicktool import click_add_options
 from clicktool import click_global_options
 from clicktool import tvicgvd
+from clicktool import validate_slice
 from globalverbose import gvd
 from mptool import output
 from unmp import unmp
 
 # from bitstring import BitArray
 # from bitstring import BitStream
+# https://github.com/scott-griffiths/bitstring
 
 signal(SIGPIPE, SIG_DFL)
 
@@ -66,23 +66,22 @@ class MaskedMMapOpen:
         self.mmfh = mmap.mmap(self.fh.fileno(), 0, flags=mmap.MAP_PRIVATE)
         for _slice in self.slices:
             slice_object_to_eval = f"self.mmfh{_slice}"
-            ic(slice_object_to_eval)
             slice_object = eval(slice_object_to_eval)
-            ic(slice_object)
             slice_object_length = len(slice_object)
-            ic(slice_object_length)
 
             zero_bytes = f"bytes({slice_object_length})"
-            ic(zero_bytes)
             to_exec = f"{slice_object_to_eval} = {zero_bytes}"
             to_exec = to_exec.encode("utf8")
-            ic(to_exec)
             exec(to_exec)
-            ic(eval(slice_object_to_eval))
 
         return self.mmfh
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(
+        self,
+        exc_type,
+        exc_val,
+        exc_tb,
+    ):
         self.mmfh.close()
         self.fh.close()
 
@@ -96,13 +95,10 @@ def read_by_byte(
     # this is called by nl2mp
     if not verbose:
         ic.disable()
-    ic(byte)
     buf = b""
     for chunk in iter(lambda: file_object.read(buffer_size), b""):
-        ic(chunk)
         buf += chunk
         sep = buf.find(byte)
-        ic(buf, sep)
 
         ret = None
         while sep != -1:
@@ -110,7 +106,7 @@ def read_by_byte(
             yield ret
             sep = buf.find(byte)
 
-    ic("fell off end:")
+    # ic("fell off end:")
     try:
         ic(ret, buf)
     except UnboundLocalError:
@@ -256,7 +252,12 @@ def hex_to_bytes(
 
     _bytes = unhexlify(_hex)
     icp(_bytes)
-    output(_bytes, reason=None, tty=tty, dict_output=dict_output)
+    output(
+        _bytes,
+        reason=None,
+        tty=tty,
+        dict_output=dict_output,
+    )
 
 
 @cli.command()
@@ -296,4 +297,9 @@ def delete_byte_ranges(
             data = fh.read()
             ic(data)
             ic(data.hex())
-            output(data, reason=path, tty=tty, dict_output=dict_output)
+            output(
+                data,
+                reason=path,
+                tty=tty,
+                dict_output=dict_output,
+            )
